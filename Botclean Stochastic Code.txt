@@ -1,0 +1,61 @@
+#include<iostream>
+#include<vector>
+using namespace std;
+void nextMove(int posr, int posc, vector <string> board) {
+    
+    //loops to find the dirty cell
+    
+    int rPosr, rPosc , dPosr, dPosc ; 
+    
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j<5; j++) {
+            
+            if (board[i][j] == 'd') {
+                
+                dPosr = i;
+                dPosc = j;
+                
+            }
+        }
+    }
+    
+    // calculate the relative position (distance between dirty cell and bot)
+    
+    rPosr = dPosr - posr;
+    rPosc = dPosc - posc;
+    
+    //movement of bot to get to dirty cell and clean it
+    
+    if (rPosr > 0){
+        cout << "DOWN";
+    }
+    
+    else if (rPosr < 0){
+        cout << "UP";
+    }
+    
+    else if (rPosc > 0){
+        cout << "RIGHT";
+    }
+    
+    else if (rPosc < 0){
+        cout << "LEFT";
+    }
+    
+    else {
+        cout << "CLEAN";
+    }
+    
+}
+int main(void) {
+    int pos[2];
+    vector <string> board;
+    cin>>pos[0]>>pos[1];
+    for(int i=0;i<5;i++) {
+        string s;
+        cin >> s;
+        board.push_back(s);
+    }
+    nextMove(pos[0], pos[1], board);
+    return 0;
+}

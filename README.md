@@ -5,5 +5,10 @@ Url-Hashtag-segmentation (easy)
 -Ebrahim saeed obaid 110030080
 
 Bidding Game (moderate)
--Ageenesh 
+-Ageenesh 110032058
+
+Pacman BFS (moderate)
+-Amy 110027364
+
+
 

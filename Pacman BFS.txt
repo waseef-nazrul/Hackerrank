@@ -1,0 +1,117 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <deque>
+
+
+using namespace std;
+
+struct node{                							//Initialize a struct for handling each node of the search tree we construct
+public:
+	int x, y;               						//We only store 2 pieces of information in this struct, the (x,y) coordinates of where the node
+	node(){}                						//lies on the graph
+	node(int x, int y){
+		this->x = x;
+		this->y = y;
+	}
+};
+
+vector<node> seen;                          					//Vector of nodes for storing all the nodes we have already visited/seen
+bool exists(node node){                      					//Function for determining whether another node exists or not
+	for (int i = 0; i < seen.size(); i++)
+		if (node.x == seen[i].x && node.y == seen[i].y)
+			return true;
+	return false;
+}
+
+vector<node> dist; 								//Vector of nodes for storing the distance from the pacman's position to the food pellet
+vector<node> curLevel; 								//Vector of nodes for keeping track of what level of the tree we are currently at
+
+bool compareNode(node aNode, node bNode){      					//Function for comparing our node struct
+
+ if(aNode.x == bNode.x && aNode.y == bNode.y){
+    return true;
+    }
+
+ return false;
+}
+
+
+
+void nextMove(int r, int c, int pacman_r, int pacman_c, int food_r, int food_c, vector <string> grid){ //Next move function provided by Hackerrank to fill in
+    int pathDist = 0;
+
+	deque<node> queue;                      				//A double-ended queue of our nodes that we have only named queue (not to be confused with the queue structure that exist in library)
+	node current(node(pacman_r, pacman_c)); 				//An instance of our node struct for storing where we are on the graph currently
+
+    dist.push_back(current);
+
+	queue.push_back(current); 						//Add the current node to our queue
+	seen.push_back(current);  						//Add the current node to our vector of visited/seen nodes
+
+	while (!queue.empty()){         					//While our queue is NOT empty...
+		current = queue.front();    					//... get the front of the queue and assign it as our current node...
+		queue.pop_front();          					//... and then pop it from our queue
+
+		if (current.x == food_r && current.y == food_c){ 		//Check if the current node has the same coordinates as the food pellet, and if it is, stop the BFS
+			break;
+		}
+
+		node neighbors[] = {                        			//The array for storing the adjacent nodes by coordinate:
+			node(current.x - 1	, current.y),			// up
+			node(current.x		, current.y - 1),		// left
+			node(current.x		, current.y + 1),		// right
+			node(current.x + 1	, current.y)			// down
+		};
+
+		for (int i = 0; i < 4; i++){                                                    		//For each direction on the grid we would like to explore...
+			if (grid[neighbors[i].x][neighbors[i].y] != '%' && !exists(neighbors[i])){  		//... check that it is not a wall and that the space we want to move to exists...
+				queue.push_back(neighbors[i]);                                          	//... and if it is valid, put it in our queue...
+				seen.push_back(neighbors[i]);                                           	//... and vector of seen nodes
+                curLevel.push_back(neighbors[i]);                                       			//Store each of the neighbours we encounter as a level in our Current Level vector
+
+                for (int j = 0; j < curLevel.size(); j++){                              			//For each element in the level, we add the current node as the parent of each node into
+                        dist.push_back(current);                                        			//yet another vector. This will be for keeping track of the distance
+                }
+
+                curLevel.clear();
+			}                                                                           		// Because we immediately pop nodes from our queue after adding them, new ones
+		}                                                                               		// automatically are considered the front of the queue
+	}
+
+	cout << seen.size() << endl;                        			//Count every node we have visited along the way, and print it out how many there are in total
+	for (int i = 0; i < seen.size(); i++)               			//Print out the coordinates for every node we have visited
+		cout << seen[i].x << " " << seen[i].y << endl;
+
+
+    for (int k = 0; k < dist.size(); k++){                  			//This is merely for comparing the elements in the dist vector. Because we added the current node that is the parent to all neigbours for
+        if (compareNode(dist[k], dist[k+1]) == false){      			//each neighbour we visit, there are multiple similar entries as a node could be a parent to many neighbours. Here, we pare down the duplicates
+        //cout<<"("<<dist[k].x<<" "<<dist[k].y<<")"<<endl;  			//so we can trace a path through the parent nodes and find the distance by incrementing 1 to the pathDist variable. We are not actually concerned 
+        pathDist = pathDist + 1;                            			//with the BFS path taken, so we don't output it but this part of the code can be uncommented to see the order in which graph was traversed.
+        }
+    }
+
+    cout << pathDist;       							//Output the BFS distance
+
+}
+
+
+int main(void) {                                    				//Main function provided by Hackerrank
+
+	int r, c, pacman_r, pacman_c, food_r, food_c;
+
+	cin >> pacman_r >> pacman_c;
+	cin >> food_r >> food_c;
+	cin >> r >> c;
+	vector <string> grid;
+
+	for (int i = 0; i<r; i++) {
+		string s; cin >> s;
+		grid.push_back(s);
+	}
+
+	nextMove(r, c, pacman_r, pacman_c, food_r, food_c, grid);
+
+	system("pause");
+	return 0;
+}
